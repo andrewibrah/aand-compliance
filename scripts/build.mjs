@@ -61,19 +61,23 @@ for (const { entry, route } of funcs) {
   console.log(`  ✓ ${route}`);
 }
 
-// ─── 4. node_modules symlink for external packages ───────────────────────────
-// Functions using --packages=external still need node_modules at runtime.
-// Vercel's Build Output API copies node_modules automatically when
-// package.json is present at the project root. No action needed.
-
-// ─── 5. Vercel output config ─────────────────────────────────────────────────
+// ─── 4. Vercel output config ──────────────────────────────────────────────────
+// Function routes MUST come before the SPA catch-all, otherwise /(.*) → /index.html
+// intercepts all /api/* requests. Static file serving goes between them.
 fs.writeFileSync(
   path.join(outputDir, "config.json"),
   JSON.stringify(
     {
       version: 3,
       routes: [
+        // API function routes — explicit paths routed to their .func bundles
+        { src: "/api/auth/login",     dest: "/api/auth/login" },
+        { src: "/api/auth/signup",    dest: "/api/auth/signup" },
+        { src: "/api/stripe/webhook", dest: "/api/stripe/webhook" },
+        { src: "/api/trpc/(.*)",      dest: "/api/trpc/[trpc]" },
+        // Serve static files (JS, CSS, images) from dist/public
         { handle: "filesystem" },
+        // SPA fallback — all remaining paths → index.html
         { src: "/(.*)", dest: "/index.html" },
       ],
     },
