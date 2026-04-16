@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import express from "express";
 import { z } from "zod";
 import * as db from "../../server/db";
 import { hashPassword, createSessionToken } from "../../server/auth";
@@ -14,40 +15,39 @@ const signupSchema = z.object({
 
 export async function signupHandler(req: Request, res: Response): Promise<void> {
   try {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method not allowed" });
-    return;
-  }
+    const parsed = signupSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Invalid input" });
+      return;
+    }
 
-  const parsed = signupSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Invalid input" });
-    return;
-  }
+    const { email, password, name } = parsed.data;
+    const normalizedEmail = email.toLowerCase().trim();
 
-  const { email, password, name } = parsed.data;
-  const normalizedEmail = email.toLowerCase().trim();
+    const existing = await db.getUserByEmail(normalizedEmail);
+    if (existing) {
+      res.status(409).json({ error: "An account with this email already exists" });
+      return;
+    }
 
-  const existing = await db.getUserByEmail(normalizedEmail);
-  if (existing) {
-    res.status(409).json({ error: "An account with this email already exists" });
-    return;
-  }
+    const passwordHash = await hashPassword(password);
+    const role = normalizedEmail === ENV.adminEmail ? "admin" : "user";
 
-  const passwordHash = await hashPassword(password);
-  const role = normalizedEmail === ENV.adminEmail ? "admin" : "user";
+    const user = await db.createUser({ email: normalizedEmail, passwordHash, name: name ?? null, role });
 
-  const user = await db.createUser({ email: normalizedEmail, passwordHash, name: name ?? null, role });
+    const token = await createSessionToken(user.id);
+    const cookieOptions = getSessionCookieOptions(req);
 
-  const token = await createSessionToken(user.id);
-  const cookieOptions = getSessionCookieOptions(req);
-
-  res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-  res.status(201).json({ success: true, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+    res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+    res.status(201).json({ success: true, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     console.error("[signup error]", err);
     res.status(500).json({ error: String(err instanceof Error ? err.message : err) });
   }
 }
 
-export default signupHandler;
+// Vercel entry point — Express wrapper ensures req.body is parsed
+const app = express();
+app.use(express.json({ limit: "10mb" }));
+app.post("/api/auth/signup", signupHandler);
+export default app;
