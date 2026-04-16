@@ -1,0 +1,395 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1776304540704,
+  "projectRoot": "/Users/me/project/aand-compliance",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "express",
+        "version": "4.21.2",
+        "category": "backend"
+      },
+      {
+        "name": "react",
+        "version": "19.2.1",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.1",
+        "category": "frontend"
+      },
+      {
+        "name": "esbuild",
+        "version": "0.25.0",
+        "category": "build"
+      },
+      {
+        "name": "vite",
+        "version": "7.1.7",
+        "category": "build"
+      },
+      {
+        "name": "vitest",
+        "version": "2.1.4",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "pnpm build",
+    "testCommand": "pnpm test",
+    "lintCommand": null,
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
+      "build": "vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+      "start": "NODE_ENV=production node dist/index.js",
+      "check": "tsc --noEmit",
+      "format": "prettier --write .",
+      "test": "vitest run",
+      "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "client": {
+      "path": "client",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1776304540679,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "drizzle": {
+      "path": "drizzle",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1776304540682,
+      "keyFiles": [
+        "0000_fair_wiccan.sql",
+        "0001_flaky_abomination.sql",
+        "relations.ts",
+        "schema.ts"
+      ]
+    },
+    "patches": {
+      "path": "patches",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1776304540689,
+      "keyFiles": [
+        "wouter@3.7.1.patch"
+      ]
+    },
+    "server": {
+      "path": "server",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1776304540694,
+      "keyFiles": [
+        "auth.logout.test.ts",
+        "db.ts",
+        "email-service.ts",
+        "pdf-generator.ts",
+        "pdf-router.ts"
+      ]
+    },
+    "shared": {
+      "path": "shared",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1776304540697,
+      "keyFiles": [
+        "const.ts",
+        "types.ts"
+      ]
+    },
+    "client/public": {
+      "path": "client/public",
+      "purpose": "Public files",
+      "fileCount": 1,
+      "lastAccessed": 1776304540698,
+      "keyFiles": []
+    },
+    "client/src": {
+      "path": "client/src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1776304540699,
+      "keyFiles": [
+        "App.tsx",
+        "const.ts",
+        "index.css"
+      ]
+    },
+    "drizzle/migrations": {
+      "path": "drizzle/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 1,
+      "lastAccessed": 1776304540699,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "",
+      "accessCount": 9,
+      "lastAccessed": 1776306322095,
+      "type": "directory"
+    },
+    {
+      "path": ".env",
+      "accessCount": 7,
+      "lastAccessed": 1776309969337,
+      "type": "file"
+    },
+    {
+      "path": "server/db.ts",
+      "accessCount": 4,
+      "lastAccessed": 1776304780038,
+      "type": "file"
+    },
+    {
+      "path": "server/routers.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304701089,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/context.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304706938,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/trpc.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304706991,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/sdk.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304709496,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/oauth.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304709548,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/cookies.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304712025,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/index.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304714260,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/env.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304719338,
+      "type": "file"
+    },
+    {
+      "path": "server/pdf-router.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776304774923,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 3,
+      "lastAccessed": 1776308546839,
+      "type": "file"
+    },
+    {
+      "path": "server/stripe-router.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776304700624,
+      "type": "file"
+    },
+    {
+      "path": "server/stripe-webhook.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776304709176,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/types/manusTypes.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776304719425,
+      "type": "file"
+    },
+    {
+      "path": "client/src/pages/Login.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1776304763944,
+      "type": "file"
+    },
+    {
+      "path": "client/src/pages/Signup.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1776304764459,
+      "type": "file"
+    },
+    {
+      "path": "vite.config.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776304764900,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/llm.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776304769740,
+      "type": "file"
+    },
+    {
+      "path": "server/storage.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776304770297,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 2,
+      "lastAccessed": 1776306309032,
+      "type": "file"
+    },
+    {
+      "path": "drizzle/schema.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304689384,
+      "type": "file"
+    },
+    {
+      "path": "drizzle.config.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304689754,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/dataApi.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304700923,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/imageGeneration.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304701152,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/map.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304703436,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/notification.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304703628,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/voiceTranscription.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304704054,
+      "type": "file"
+    },
+    {
+      "path": "server/pdf-generator.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304709704,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/systemRouter.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304711933,
+      "type": "file"
+    },
+    {
+      "path": "server/email-service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304712252,
+      "type": "file"
+    },
+    {
+      "path": "server/_core/types/cookie.d.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304717163,
+      "type": "file"
+    },
+    {
+      "path": "shared/const.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304769351,
+      "type": "file"
+    },
+    {
+      "path": "client/src/const.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776304779955,
+      "type": "file"
+    },
+    {
+      "path": "tsconfig.json",
+      "accessCount": 1,
+      "lastAccessed": 1776306324717,
+      "type": "file"
+    },
+    {
+      "path": "client/src/hooks/useAuth.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776306324850,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
