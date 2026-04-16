@@ -1,7 +1,3 @@
 {
-  "buildCommand": "pnpm run vercel-build",
-  "outputDirectory": "dist/public",
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  "buildCommand": "pnpm run vercel-build"
 }
