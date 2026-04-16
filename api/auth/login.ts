@@ -11,6 +11,7 @@ const loginSchema = z.object({
 });
 
 export async function loginHandler(req: Request, res: Response): Promise<void> {
+  try {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
@@ -41,6 +42,10 @@ export async function loginHandler(req: Request, res: Response): Promise<void> {
 
   res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
   res.json({ success: true, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+  } catch (err) {
+    console.error("[login error]", err);
+    res.status(500).json({ error: String(err instanceof Error ? err.message : err) });
+  }
 }
 
 export default loginHandler;
