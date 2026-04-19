@@ -7,6 +7,16 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 
+const getEmailRedirectTo = () => {
+  if (typeof window === 'undefined') {
+    return import.meta.env.VITE_APP_URL || undefined;
+  }
+
+  const basePath = import.meta.env.BASE_URL || '/';
+  const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+  return new URL(normalizedBasePath, window.location.origin).toString();
+};
+
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { isAuthenticated, loading } = useAuth();
@@ -31,7 +41,10 @@ export default function Signup() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { name } },
+        options: {
+          data: { name },
+          emailRedirectTo: getEmailRedirectTo(),
+        },
       });
       if (error) {
         setError(error.message);
