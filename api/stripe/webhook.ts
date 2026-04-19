@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import express from "express";
 import type { Response } from "express";
 import { handleStripeWebhook, verifyStripeSignature } from "../../server/stripe-webhook";
-
+// @ts-ignore
 export const config = { api: { bodyParser: false } };
 
 async function stripeWebhookHandler(req: IncomingMessage, res: ServerResponse): Promise<void> {
