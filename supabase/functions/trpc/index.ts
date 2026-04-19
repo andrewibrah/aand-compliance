@@ -2,6 +2,7 @@ import { fetchRequestHandler } from 'npm:@trpc/server/adapters/fetch';
 import { handleCors, getCorsHeaders } from '../_shared/cors.ts';
 import { getUserFromToken } from '../_shared/supabase.ts';
 import * as db from '../_shared/db.ts';
+import { ENV } from '../_shared/env.ts';
 import { appRouter } from '../_shared/routers.ts';
 
 Deno.serve(async (req: Request) => {
@@ -16,7 +17,24 @@ Deno.serve(async (req: Request) => {
       const authHeader = req.headers.get('Authorization');
       const token = authHeader?.split(' ')[1];
       const authUser = token ? await getUserFromToken(token) : null;
-      const user = authUser ? await db.getUserById(authUser.id) : null;
+      let user = null;
+
+      if (authUser?.email) {
+        const normalizedEmail = authUser.email.trim().toLowerCase();
+        const displayName =
+          typeof authUser.user_metadata?.name === 'string'
+            ? authUser.user_metadata.name.trim()
+            : '';
+        const role = normalizedEmail === ENV.adminEmail.trim().toLowerCase() ? 'admin' : 'user';
+
+        user = await db.createUser({
+          id: authUser.id,
+          email: normalizedEmail,
+          name: displayName,
+          role,
+        });
+      }
+
       return { user };
     },
     onError: ({ error }) => {

@@ -24,10 +24,23 @@ async function getUserFromRequest(req: Request): Promise<User | null> {
     const { data: { user: authUser }, error } = await supabase.auth.getUser(token);
     if (error || !authUser) return null;
 
-    const user = await db.getUserById(authUser.id);
-    if (user) {
-      await db.updateUserLastSignedIn(user.id);
-    }
+    const normalizedEmail = authUser.email?.trim().toLowerCase();
+    if (!normalizedEmail) return null;
+
+    const displayName =
+      typeof authUser.user_metadata?.name === 'string'
+        ? authUser.user_metadata.name.trim()
+        : '';
+    const role = normalizedEmail === ENV.adminEmail ? 'admin' : 'user';
+
+    const user = await db.createUser({
+      id: authUser.id,
+      email: normalizedEmail,
+      name: displayName,
+      role,
+    });
+
+    await db.updateUserLastSignedIn(user.id);
     return user;
   } catch {
     return null;

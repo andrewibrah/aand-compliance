@@ -12,6 +12,23 @@ const complianceAnswerValueSchema = z.union([
   z.null(),
 ]);
 
+async function getOrCreateDefaultDealership(userId: string) {
+  const existing = await db.getDealershipByUserId(userId);
+  if (existing) return existing;
+
+  return db.createDealership({
+    userId,
+    name: 'My Dealership',
+    address: '',
+    city: '',
+    state: '',
+    dmsVendor: '',
+    rooftopCount: 1,
+    qualifiedIndividual: '',
+    qiEmail: '',
+  });
+}
+
 export const appRouter = router({
   system: systemRouter,
 
@@ -113,8 +130,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const dealership = await db.getDealershipByUserId(ctx.user.id);
-        if (!dealership) throw new Error('No dealership found');
+        const dealership = await getOrCreateDefaultDealership(ctx.user.id);
         await db.saveComplianceAnswer({
           dealershipId: dealership.id,
           section: input.section,
@@ -135,8 +151,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const dealership = await db.getDealershipByUserId(ctx.user.id);
-        if (!dealership) throw new Error('No dealership found');
+        const dealership = await getOrCreateDefaultDealership(ctx.user.id);
         await db.saveComplianceAnswer({
           dealershipId: dealership.id,
           section: input.section,

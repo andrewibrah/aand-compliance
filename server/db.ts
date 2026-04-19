@@ -25,7 +25,19 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function createUser(data: Omit<typeof users.$inferInsert, 'createdAt' | 'updatedAt'>) {
-  const [user] = await getDb().insert(users).values(data).returning();
+  const [user] = await getDb()
+    .insert(users)
+    .values(data)
+    .onConflictDoUpdate({
+      target: users.id,
+      set: {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
   return user;
 }
 

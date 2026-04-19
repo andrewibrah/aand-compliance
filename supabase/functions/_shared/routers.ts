@@ -5,6 +5,23 @@ import { stripeRouter } from './stripe-router.ts';
 import { ENV } from './env.ts';
 import { router, publicProcedure, protectedProcedure } from './trpc.ts';
 
+async function getOrCreateDefaultDealership(userId: string) {
+  const existing = await db.getDealershipByUserId(userId);
+  if (existing) return existing;
+
+  return db.createDealership({
+    userId,
+    name: 'My Dealership',
+    address: '',
+    city: '',
+    state: '',
+    dmsVendor: '',
+    rooftopCount: 1,
+    qualifiedIndividual: '',
+    qiEmail: '',
+  });
+}
+
 const authRouter = router({
   me: publicProcedure.query(({ ctx }) => ctx.user),
   logout: publicProcedure.mutation(() => ({ success: true })),
@@ -86,8 +103,7 @@ const complianceRouter = router({
       completed: z.boolean().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const dealership = await db.getDealershipByUserId(ctx.user.id);
-      if (!dealership) throw new TRPCError({ code: 'NOT_FOUND' });
+      const dealership = await getOrCreateDefaultDealership(ctx.user.id);
       return db.saveComplianceAnswer({
         dealershipId: dealership.id,
         section: input.section,
@@ -108,8 +124,7 @@ const complianceRouter = router({
       completed: z.union([z.boolean(), z.number()]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const dealership = await db.getDealershipByUserId(ctx.user.id);
-      if (!dealership) throw new TRPCError({ code: 'NOT_FOUND' });
+      const dealership = await getOrCreateDefaultDealership(ctx.user.id);
       const completed = input.completed !== undefined ? Boolean(input.completed) : undefined;
       return db.saveComplianceAnswer({
         dealershipId: dealership.id,
