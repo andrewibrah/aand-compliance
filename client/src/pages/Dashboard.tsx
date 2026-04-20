@@ -1,41 +1,71 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
+import { AlertTriangle, CheckCircle2, AlertCircle, TrendingUp, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { SAFEGUARDS_SECTIONS } from "@/data/safeguards-questions";
+import { calculateSectionScore, calculateOverallScore } from "@/lib/scoring";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const { user, loading } = useAuth();
+  const { user, session, loading } = useAuth();
   const [overallScore, setOverallScore] = useState(0);
   const [sectionScores, setSectionScores] = useState<Record<number, number>>({});
+  const [isLoadingScores, setIsLoadingScores] = useState(true);
 
-  // TODO: Load compliance data from trpc.compliance.getAll
   useEffect(() => {
-    // Placeholder scores for demo
-    setSectionScores({
-      1: 85,
-      2: 70,
-      3: 60,
-      4: 45,
-      5: 55,
-      6: 75,
-      7: 50,
-      8: 80,
-      9: 65,
-    });
+    if (!session?.user?.id) {
+      setIsLoadingScores(false);
+      return;
+    }
 
-    const scores = Object.values({ 1: 85, 2: 70, 3: 60, 4: 45, 5: 55, 6: 75, 7: 50, 8: 80, 9: 65 });
-    const avg = Math.round(scores.reduce((a, b) => a + b) / scores.length);
-    setOverallScore(avg);
-  }, []);
+    supabase
+      .from("compliance_answers")
+      .select("section, answers")
+      .eq("user_id", session.user.id)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Failed to load compliance answers:", error);
+          setIsLoadingScores(false);
+          return;
+        }
 
-  if (loading) {
+        const grouped: Record<number, Record<string, any>> = {};
+        (data ?? []).forEach((row) => {
+          grouped[row.section] = (row.answers as Record<string, any>) ?? {};
+        });
+
+        const newScores: Record<number, number> = {};
+        const allScores = [];
+
+        for (const sec of SAFEGUARDS_SECTIONS) {
+          const sectionAnswers = grouped[sec.number] || {};
+          const scoreResult = calculateSectionScore(sectionAnswers, sec.questions);
+          newScores[sec.number] = scoreResult.score;
+          allScores.push({ ...scoreResult, section: sec.number, sectionName: sec.name });
+        }
+
+        setSectionScores(newScores);
+
+        if (allScores.length > 0) {
+          const overall = calculateOverallScore(allScores);
+          setOverallScore(overall.overall);
+        }
+
+        setIsLoadingScores(false);
+      });
+  }, [session?.user?.id]);
+
+  if (loading || isLoadingScores) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-center">
+          <Loader2 className="animate-spin text-amber-500 mx-auto mb-4" size={40} />
+          <p className="text-slate-300">Loading your compliance data...</p>
+        </div>
       </div>
     );
   }
@@ -59,18 +89,10 @@ export default function Dashboard() {
     return "bg-green-950/30 border-green-600";
   };
 
-  const sectionNames = [
-    "",
-    "Qualified Individual",
-    "Risk Assessment",
-    "Data Inventory",
-    "Access Controls",
-    "Encryption",
-    "Vendor Management",
-    "Incident Response",
-    "Employee Training",
-    "Penetration Testing",
-  ];
+  const sectionNames = SAFEGUARDS_SECTIONS.reduce<Record<number, string>>(
+    (acc, sec) => { acc[sec.number] = sec.name; return acc; },
+    {}
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -122,7 +144,7 @@ export default function Dashboard() {
             <div>
               <h3 className="text-sm font-semibold text-slate-300 mb-4">Sections Completed</h3>
               <div className="text-3xl font-bold text-white">
-                {Object.keys(sectionScores).length} <span className="text-lg text-slate-400">/ 9</span>
+                {Object.values(sectionScores).filter((s) => s > 0).length} <span className="text-lg text-slate-400">/ 9</span>
               </div>
             </div>
 
